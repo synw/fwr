@@ -33,9 +33,9 @@ func watch() {
 				fmt.Println(msg)
 				wg.Add(1)
 				runBuild(&wg, &mux)
+				wg.Wait()
 				//fmt.Println("Reload")
 				ws.SendMsg(msg)
-				wg.Wait()
 			case err := <-w.Error:
 				msg := "Watcher error " + err.Error()
 				fmt.Println(msg)
