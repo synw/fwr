@@ -7,7 +7,7 @@ A development server for Flutter web
 
 ## Usage
 
-Grab the binary (or compile with Go) and put it in the path
+Grab the [Linux binary](https://github.com/synw/fwr/releases/download/0.1.0/fwr) or compile with Go, and and put the executable in the path
 
 Add this to `web/index.html` in your project:
 
