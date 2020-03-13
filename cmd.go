@@ -2,13 +2,11 @@ package main
 
 import (
 	"bufio"
-	//"fmt"
 	"log"
 	"os/exec"
 )
 
 func runBuildCmd() error {
-	//fmt.Println("Compile for web")
 	cmd := exec.Command("flutter", "build", "web")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {

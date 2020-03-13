@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -11,8 +12,10 @@ import (
 )
 
 var w = wa.New()
+var building = false
+var changeRequestedWhileBuilding = false
 
-func watch() {
+func watch(verbose bool) {
 	err := w.AddRecursive("lib")
 	if err != nil {
 		panic("Can not add path lib")
@@ -24,18 +27,21 @@ func watch() {
 	w.FilterOps(wa.Write, wa.Create, wa.Move, wa.Remove, wa.Rename)
 	// lauch listener
 	var mux sync.Mutex
-	var wg sync.WaitGroup
 	go func() {
 		for {
 			select {
 			case e := <-w.Event:
-				msg := "Change detected in " + e.Path
-				fmt.Println(msg)
-				wg.Add(1)
-				runBuild(&wg, &mux)
-				wg.Wait()
-				//fmt.Println("Reload")
-				ws.SendMsg(msg)
+				noBuild := strings.HasSuffix(e.Path, "generated_plugin_registrant.dart")
+				if noBuild == false {
+					if building == false {
+						go build(&mux, e.Path, verbose)
+					} else {
+						if verbose {
+							fmt.Println("Change requested while building, delaying next build")
+						}
+						changeRequestedWhileBuilding = true
+					}
+				}
 			case err := <-w.Error:
 				msg := "Watcher error " + err.Error()
 				fmt.Println(msg)
@@ -54,9 +60,26 @@ func watch() {
 	}
 }
 
-func runBuild(wg *sync.WaitGroup, mux *sync.Mutex) {
+func build(mux *sync.Mutex, path string, verbose bool) {
+	building = true
+	msg := "Change detected in " + path
+	if verbose {
+		fmt.Println(msg)
+	}
+	if verbose {
+		fmt.Println("Running build ...")
+	}
 	mux.Lock()
-	defer mux.Unlock()
 	runBuildCmd()
-	wg.Done()
+	mux.Unlock()
+	if verbose {
+		fmt.Println("Build done")
+	}
+	ws.SendMsg(msg)
+	building = false
+	if changeRequestedWhileBuilding == true {
+		changeRequestedWhileBuilding = false
+
+		build(mux, path, verbose)
+	}
 }
