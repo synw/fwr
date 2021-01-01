@@ -16,11 +16,11 @@ var building = false
 var changeRequestedWhileBuilding = false
 
 func watch(verbose bool) {
-	err := w.AddRecursive("lib")
+	err := w.AddRecursive("./lib")
 	if err != nil {
 		panic("Can not add path lib")
 	}
-	err = w.AddRecursive("web")
+	err = w.AddRecursive("./web")
 	if err != nil {
 		panic("Can not add path web")
 	}
