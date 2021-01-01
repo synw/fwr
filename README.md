@@ -9,7 +9,7 @@ A development server for Flutter web
 
 ### Get the server
 
-Grab the [Linux binary](https://github.com/synw/fwr/releases/download/0.1.0/fwr) or compile with Go, and and put the executable in the path
+Grab the [Linux binary](https://github.com/synw/fwr/releases/download/0.1.0/fwr) or compile with Go, and put the executable in the path
 or in your local Flutter project directory
 
 ### Setup the autoreload
